@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+jobs:
+  test-and-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+      - name: Run tests
+        run: go test -v ./...
+      - name: Validate docker-compose
+        run: docker compose config -q
+      - name: Build and start services
+        run: |
+          docker compose build
+          docker compose up -d server
+          sleep 5
+          docker compose logs server
+      - name: Run client
+        run: docker compose run --rm client
+      - name: Cleanup
+        if: always()
+        run: docker compose down -v

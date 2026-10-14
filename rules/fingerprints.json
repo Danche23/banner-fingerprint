@@ -1,0 +1,164 @@
+{
+  "rules": [
+    {
+      "protocol": "SSH",
+      "confidence": 0.95,
+      "port_hints": [],
+      "patterns": [
+        {
+          "regex": "SSH-[\\d.]+-(?P<product>[A-Za-z]+)[_/](?P<version>[\\d.p]+)(?:\\s+(?P<os_hint>[A-Za-z]+))?",
+          "static_product": ""
+        }
+      ]
+    },
+    {
+      "protocol": "HTTP",
+      "confidence": 0.9,
+      "port_hints": [],
+      "patterns": [
+        {
+          "regex": "(?i)Server:\\s*(?P<product>[\\w.\\-]+)/(?P<version>[\\d.]+)(?:\\s*\\((?P<os_hint>[A-Za-z]+)\\))?",
+          "static_product": ""
+        }
+      ]
+    },
+    {
+      "protocol": "MySQL",
+      "confidence": 0.9,
+      "port_hints": [3306],
+      "patterns": [
+        {
+          "regex": "^J[\\x00-\\xff]{3}\\n(?P<version>\\d+\\.\\d+\\.\\d+)",
+          "static_product": "MySQL"
+        },
+        {
+          "regex": "^J[\\s\\S]{3}\\n(?P<version>\\d+\\.\\d+\\.\\d+)",
+          "static_product": "MySQL"
+        }
+      ]
+    },
+    {
+      "protocol": "Redis",
+      "confidence": 0.95,
+      "port_hints": [],
+      "patterns": [
+        {
+          "regex": "^\\+PONG",
+          "static_product": "Redis"
+        },
+        {
+          "regex": "^-(?:ERR|NOAUTH|WRONGTYPE|MOVED|ASK|BUSY|NOSCRIPT|LOADING|MASTERDOWN|READONLY|EXECABORT|SLOWLOG|MISCONF) ",
+          "static_product": "Redis"
+        },
+        {
+          "regex": "^-ERR",
+          "static_product": "Redis"
+        }
+      ]
+    },
+    {
+      "protocol": "FTP",
+      "confidence": 0.9,
+      "port_hints": [],
+      "patterns": [
+        {
+          "regex": "^220[\\s-]+(?P<product>ProFTPD)\\s+(?P<version>[\\d.]+)",
+          "static_product": ""
+        },
+        {
+          "regex": "^220[\\s-]+\\((?P<product>[A-Za-z]+)\\s+(?P<version>[\\d.]+)\\)",
+          "static_product": ""
+        },
+        {
+          "regex": "^220[\\s-]+Welcome to (?P<product>Pure-FTPd)(?:\\s+(?P<version>[\\d.]+))?",
+          "static_product": ""
+        },
+        {
+          "regex": "^220[\\s-]+(?P<product>FileZilla\\s+Server|WS_FTP|Wu-FTP)[^\\d]*(?P<version>[\\d.]+)?",
+          "static_product": ""
+        },
+        {
+          "regex": "^220[\\s-]",
+          "static_product": "FTP"
+        }
+      ]
+    },
+    {
+      "protocol": "SMTP",
+      "confidence": 0.9,
+      "port_hints": [],
+      "patterns": [
+        {
+          "regex": "^220\\s+\\S+\\s+(?:E?SMTP|Mail Server)\\s*(?P<product>[\\w]+)?",
+          "static_product": "SMTP"
+        }
+      ]
+    },
+    {
+      "protocol": "TLS",
+      "confidence": 0.7,
+      "port_hints": [],
+      "patterns": [
+        {
+          "regex": "^(?:\\\\x16\\\\x03|\\x16\\x03)",
+          "static_product": "TLS"
+        }
+      ]
+    },
+    {
+      "protocol": "RDP",
+      "confidence": 0.8,
+      "port_hints": [3389],
+      "patterns": [
+        {
+          "regex": "^\\x03\\x00",
+          "static_product": "RDP"
+        }
+      ]
+    },
+    {
+      "protocol": "Telnet",
+      "confidence": 0.8,
+      "port_hints": [23],
+      "patterns": [
+        {
+          "regex": "^\\xff[\\xfb-\\xfe]",
+          "static_product": "Telnet"
+        }
+      ]
+    },
+    {
+      "protocol": "MongoDB",
+      "confidence": 0.85,
+      "port_hints": [27017],
+      "patterns": [
+        {
+          "regex": "(?i)mongodb",
+          "static_product": "MongoDB"
+        }
+      ]
+    },
+    {
+      "protocol": "PostgreSQL",
+      "confidence": 0.85,
+      "port_hints": [5432],
+      "patterns": [
+        {
+          "regex": "(?i)postgresql|PGSQL",
+          "static_product": "PostgreSQL"
+        }
+      ]
+    },
+    {
+      "protocol": "Elasticsearch",
+      "confidence": 0.9,
+      "port_hints": [9200, 9300],
+      "patterns": [
+        {
+          "regex": "(?i)\"tagline\"\\s*:\\s*\"You Know, for Search\"",
+          "static_product": "Elasticsearch"
+        }
+      ]
+    }
+  ]
+}

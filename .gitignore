@@ -1,0 +1,6 @@
+*.log
+.env
+data/*.json
+!data/input.json
+tmp/
+dist/
