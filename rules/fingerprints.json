@@ -3,11 +3,35 @@
     {
       "protocol": "SSH",
       "confidence": 0.95,
-      "port_hints": [],
+      "port_hints": [22],
       "patterns": [
         {
-          "regex": "SSH-[\\d.]+-(?P<product>[A-Za-z]+)[_/](?P<version>[\\d.p]+)(?:\\s+(?P<os_hint>[A-Za-z]+))?",
+          "regex": "(?i)SSH-[\\d.]+-OpenSSH_for_(?P<os_hint>[A-Za-z]+)[_/](?P<version>[\\d.p]+)",
+          "static_product": "OpenSSH"
+        },
+        {
+          "regex": "(?i)SSH-[\\d.]+-(?P<product>OpenSSH)[_/](?P<version>[\\d.p]+)(?:\\s+(?P<os_hint>[A-Za-z]+))?",
           "static_product": ""
+        },
+        {
+          "regex": "(?i)SSH-[\\d.]+-(?P<product>dropbear)[_/](?P<version>[\\d.]+)",
+          "static_product": ""
+        },
+        {
+          "regex": "(?i)SSH-[\\d.]+-(?P<product>libssh)[_/](?P<version>[\\d.]+)",
+          "static_product": ""
+        },
+        {
+          "regex": "(?i)SSH-[\\d.]+-(?P<product>[A-Za-z][A-Za-z0-9]+)-(?P<version>[\\d][\\d.]+)",
+          "static_product": ""
+        },
+        {
+          "regex": "(?i)SSH-[\\d.]+-[A-Za-z0-9_]+",
+          "static_product": "SSH"
+        },
+        {
+          "regex": "(?i)^SSH-[\\d.]+-$",
+          "static_product": "SSH"
         }
       ]
     },
@@ -17,8 +41,35 @@
       "port_hints": [],
       "patterns": [
         {
-          "regex": "(?i)Server:\\s*(?P<product>[\\w.\\-]+)/(?P<version>[\\d.]+)(?:\\s*\\((?P<os_hint>[A-Za-z]+)\\))?",
+          "regex": "(?i)Server:\\s*(?P<product>[\\w.\\-]+(?:\\s+[\\w.]+)?)/(?P<version>[\\d.]+)(?:\\s*\\((?P<os_hint>[A-Za-z]+)\\))?",
           "static_product": ""
+        },
+        {
+          "regex": "(?i)Server:\\s*Jetty\\((?P<version>[\\d.]+)\\)",
+          "static_product": "Jetty"
+        },
+        {
+          "regex": "(?i)Server:\\s*(?P<product>[A-Za-z][A-Za-z0-9.\\-]+)(?:\\s|$|\\r)",
+          "static_product": ""
+        },
+        {
+          "regex": "^HTTP/[\\d.]+ \\d{3}",
+          "static_product": "HTTP"
+        }
+      ]
+    },
+    {
+      "protocol": "MariaDB",
+      "confidence": 0.95,
+      "port_hints": [3306],
+      "patterns": [
+        {
+          "regex": "^J[\\x00-\\xff]{3}\\n[\\d.]+(?:-(?P<version>[\\d.]+)-MariaDB)",
+          "static_product": "MariaDB"
+        },
+        {
+          "regex": "^J[\\s\\S]{3}\\n[\\d.]+(?:-(?P<version>[\\d.]+)-MariaDB)",
+          "static_product": "MariaDB"
         }
       ]
     },
@@ -47,12 +98,50 @@
           "static_product": "Redis"
         },
         {
-          "regex": "^-(?:ERR|NOAUTH|WRONGTYPE|MOVED|ASK|BUSY|NOSCRIPT|LOADING|MASTERDOWN|READONLY|EXECABORT|SLOWLOG|MISCONF) ",
+          "regex": "^\\+OK(?:\\r?\\n|$)",
           "static_product": "Redis"
         },
         {
-          "regex": "^-ERR",
+          "regex": "^-(?:ERR|NOAUTH|WRONGTYPE|MOVED|ASK|BUSY|NOSCRIPT|LOADING|MASTERDOWN|READONLY|EXECABORT|SLOWLOG|MISCONF|DENIED|RESET)\\b",
           "static_product": "Redis"
+        },
+        {
+          "regex": "(?i)Redis is running in protected mode",
+          "static_product": "Redis"
+        }
+      ]
+    },
+    {
+      "protocol": "Memcached",
+      "confidence": 0.9,
+      "port_hints": [11211],
+      "patterns": [
+        {
+          "regex": "^VERSION (?P<version>[\\d.]+)",
+          "static_product": "Memcached"
+        },
+        {
+          "regex": "^ERROR\\r?$",
+          "static_product": "Memcached"
+        }
+      ]
+    },
+    {
+      "protocol": "SMTP",
+      "confidence": 0.9,
+      "port_hints": [25, 465, 587],
+      "patterns": [
+        {
+          "regex": "^220[\\s-]+\\S+\\s+(?:E?SMTP)\\s+(?P<product>Postfix|Sendmail|Exim|Qmail|Exchange)[^\\n]*",
+          "static_product": ""
+        },
+        {
+          "regex": "^220[\\s-]+.*(?P<product>Postfix|Sendmail|Exim|Qmail|Exchange)",
+          "static_product": ""
+        },
+        {
+          "regex": "^220[\\s-]+\\S+\\s+E?SMTP\\b",
+          "static_product": "SMTP"
         }
       ]
     },
@@ -70,7 +159,19 @@
           "static_product": ""
         },
         {
-          "regex": "^220[\\s-]+Welcome to (?P<product>Pure-FTPd)(?:\\s+(?P<version>[\\d.]+))?",
+          "regex": "^220[\\s-]+Welcome to (?P<product>Pure-FTPd)(?:\\s+[^\\n]*)?",
+          "static_product": ""
+        },
+        {
+          "regex": "^220[\\s-]+(?P<product>Pure-FTPd)[^\\n]*",
+          "static_product": ""
+        },
+        {
+          "regex": "^220[\\s-]+(?P<product>Serv-U) FTP Server v(?P<version>[\\d.]+)",
+          "static_product": ""
+        },
+        {
+          "regex": "^220[\\s-]+(?P<product>Microsoft FTP Service)",
           "static_product": ""
         },
         {
@@ -84,13 +185,77 @@
       ]
     },
     {
-      "protocol": "SMTP",
+      "protocol": "POP3",
       "confidence": 0.9,
-      "port_hints": [],
+      "port_hints": [110, 995],
       "patterns": [
         {
-          "regex": "^220\\s+\\S+\\s+(?:E?SMTP|Mail Server)\\s*(?P<product>[\\w]+)?",
-          "static_product": "SMTP"
+          "regex": "^\\+OK\\s+(?P<product>Dovecot|Cyrus|UW|qpopper)[^\\n]*",
+          "static_product": ""
+        },
+        {
+          "regex": "^\\+OK\\b",
+          "static_product": "POP3"
+        }
+      ]
+    },
+    {
+      "protocol": "IMAP",
+      "confidence": 0.9,
+      "port_hints": [143, 993],
+      "patterns": [
+        {
+          "regex": "^\\* OK.*(?:IMAP4|IMAP)",
+          "static_product": "IMAP"
+        },
+        {
+          "regex": "^\\* OK [^\\n]+ (?P<product>Dovecot|Cyrus|UW-IMAP|Exchange)",
+          "static_product": ""
+        }
+      ]
+    },
+    {
+      "protocol": "VNC",
+      "confidence": 0.9,
+      "port_hints": [5900, 5901],
+      "patterns": [
+        {
+          "regex": "^RFB (?P<version>[\\d.]+)",
+          "static_product": "VNC"
+        }
+      ]
+    },
+    {
+      "protocol": "SMB",
+      "confidence": 0.85,
+      "port_hints": [445, 139],
+      "patterns": [
+        {
+          "regex": "\\xffSMB",
+          "static_product": "SMB"
+        },
+        {
+          "regex": "\\\\xffSMB",
+          "static_product": "SMB"
+        }
+      ]
+    },
+    {
+      "protocol": "PostgreSQL",
+      "confidence": 0.85,
+      "port_hints": [5432],
+      "patterns": [
+        {
+          "regex": "(?i)postgresql|PGSQL",
+          "static_product": "PostgreSQL"
+        },
+        {
+          "regex": "^[EN]FATAL:.*(?:frontend protocol|PostgreSQL|invalid packet)",
+          "static_product": "PostgreSQL"
+        },
+        {
+          "regex": "^[EN]ERROR:.*(?:PostgreSQL|syntax error|connection)",
+          "static_product": "PostgreSQL"
         }
       ]
     },
@@ -122,7 +287,7 @@
       "port_hints": [23],
       "patterns": [
         {
-          "regex": "^\\xff[\\xfb-\\xfe]",
+          "regex": "^\\xff[\\xfb\\xfc\\xfd]",
           "static_product": "Telnet"
         }
       ]
@@ -135,17 +300,6 @@
         {
           "regex": "(?i)mongodb",
           "static_product": "MongoDB"
-        }
-      ]
-    },
-    {
-      "protocol": "PostgreSQL",
-      "confidence": 0.85,
-      "port_hints": [5432],
-      "patterns": [
-        {
-          "regex": "(?i)postgresql|PGSQL",
-          "static_product": "PostgreSQL"
         }
       ]
     },
